@@ -1,3 +1,9 @@
+from core.Luchthaven import Luchthaven
 
-def __main__():
-    pass
+def main():
+    luchthaven = Luchthaven()
+    luchthaven.init()
+
+
+if __name__ == "__main__":
+    main()
