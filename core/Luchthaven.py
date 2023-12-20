@@ -1,3 +1,4 @@
+from database.DbManager import DbManager
 import re
 
 class Luchthaven():
@@ -16,11 +17,11 @@ class Luchthaven():
                 if re.match(r'^[1-4]$', choice):
                     match choice:
                         case "1":
-                            pass
+                            print(self.get_flights())
                         case "2":
-                            pass
+                            self.add_flight()
                         case "3":
-                            pass
+                            self.cancel_flight()
                         case "4":
                             print("\n\nTot ziens!")
                             return;
@@ -29,6 +30,13 @@ class Luchthaven():
             except ValueError:
                 print("Gelieve een geldige waarde in te vullen.")
 
-        
+    def get_flights(self):
+        db_manager = DbManager()
+        #get flights from db...
+        pass
 
-        
+    def add_flight(self):
+        pass
+
+    def cancel_flight(self):
+        pass
