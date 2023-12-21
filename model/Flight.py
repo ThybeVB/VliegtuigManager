@@ -8,4 +8,4 @@ class Flight:
 
 
     def get_summary(self):
-        return "Flight " + self.iata_code + " from " + self.origin_airport + " to " + self.arrival_airport + " at " + self.timestamp + "."
+        return f"Vlucht {self.iata_code} van {self.origin_airport} naar {self.arrival_airport} is ingepland om {self.timestamp}."

@@ -39,7 +39,7 @@ class Luchthaven():
             return "Er werden geen vluchten gevonden"
         else:
             for flight in output:
-                print(f"Vlucht {flight.iata_code} van {flight.origin_airport} naar {flight.arrival_airport} is ingepland om {flight.timestamp}.")
+                print(flight.get_summary())
         
 
     def add_flight(self):
