@@ -4,7 +4,7 @@ class Flight:
         self.iata_code = iata_code
         self.origin_airport = origin_airport
         self.arrival_airport = arrival_airport
-        self.timestamp = timestamp;
+        self.timestamp = timestamp
 
 
     def get_summary(self):
