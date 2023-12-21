@@ -1,4 +1,4 @@
-import sqlite3, sys, os
+import sqlite3, sys
 from model.Flight import Flight
 
 class DbManager:
@@ -16,12 +16,23 @@ class DbManager:
 
     def initialize(self):
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS flights (id INTEGER PRIMARY KEY, iata_code TEXT, origin_airport TEXT, arrival_airport TEXT, timestamp TEXT)''')
+        
         self.db_connectie.commit()
 
     # todo: uitbreiden met zoeken op datum, bestemming
-    def get_flights(self):
+    def get_flights(self, origin_airport=None, arrival_airport=None):
         try:
-            self.cursor.execute('''SELECT * FROM flights''')
+            query = ""
+            if origin_airport is None and arrival_airport is None:
+                query = '''SELECT * FROM flights'''
+            elif origin_airport is not None and arrival_airport is None:
+                query = f"SELECT * FROM flights WHERE origin_airport={origin_airport}"
+            elif origin_airport is None and arrival_airport is not None:
+                query = f"SELECT * FROM flights WHERE arrival_airport={arrival_airport}"
+            else:
+                query = f"SELECT * FROM flights WHERE arrival_airport={arrival_airport} AND origin_airport={origin_airport}"
+
+            self.cursor.execute(query)
             flights = self.cursor.fetchall()
             if len(flights) == 0:
                 return None
@@ -38,5 +49,18 @@ class DbManager:
 
                 return flightList
         except Exception as e:
-            print("Fout bij uitvoeren query: ", e)   
+            print("Fout bij uitvoeren query: ", e)
 
+    def add_flight(self, iata, origin, arrival, timestamp):
+        try:
+            self.cursor.execute("INSERT INTO flights (iata_code, origin_airport, arrival_airport, timestamp) VALUES (?, ?, ?, ?)", (iata, origin, arrival, timestamp))
+            self.db_connectie.commit()
+        except Exception as e:
+            print("Fout bij uitvoeren query: ", e)          
+
+
+    def close_connection(self):
+        if self.cursor:
+            self.cursor.close()
+        if self.db_connectie:
+            self.db_connectie.close()
