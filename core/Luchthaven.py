@@ -99,5 +99,5 @@ class Luchthaven():
 
         print("Wat is het vluchtnummer?")
         iata_code = input("> ").strip().lower()
-
-        self.db_manager.cancel_flight()
+        self.db_manager.cancel_flight(iata_code)
+        print(f"Vlucht {iata_code.upper()} werd geschrapt.")
