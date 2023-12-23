@@ -1,5 +1,5 @@
 from database.DbManager import DbManager
-import re
+import re, locale, csv
 
 class Luchthaven():
 
@@ -41,7 +41,37 @@ class Luchthaven():
         else:
             for flight in output:
                 print(flight.get_summary())
-        
+
+            print("Wil je deze geselecteerde vluchten wegschrijven naar een CSV-bestand? (J/N)")
+            csv_keuze = input("> ").strip().lower()
+            if re.match(r'^[jn]$', csv_keuze):
+                match csv_keuze:
+                    case "j":
+                        self.generate_csv(output)
+                        print("CSV-bestand werd weggeschreven naar Vluchten.csv")
+                    case "n":
+                        return
+            else:
+                print("Gelieve een correct argument te geven (J/N)")
+
+    def generate_csv(self, flight_list):
+        locale.setlocale(locale.LC_ALL, 'nl_BE.UTF-8')
+
+        try:
+            with open('Vluchten.csv', 'w', newline='') as invoice_file:
+                writer = csv.writer(invoice_file)
+                header = ["IATA Code", "Vliegt vanuit", "Vliegt naar", "Tijdstip"]
+                writer.writerow(header)
+                for flight in flight_list:
+                    flight_record = []
+                    flight_record.append(flight.iata_code)
+                    flight_record.append(flight.origin_airport)
+                    flight_record.append(flight.arrival_airport)
+                    flight_record.append(flight.timestamp)
+                    writer.writerow(flight_record)
+        except Exception as e:
+            print("Fout bij wegschrijven: ", e)
+
 
     def add_flight(self): #todo: add nullchecks en validatie
         print("Je hebt gekozen een vlucht toe te voegen.")
@@ -65,4 +95,9 @@ class Luchthaven():
         print("Vlucht toegevoegd!\n")
 
     def cancel_flight(self):
-        pass
+        print("Je hebt gekozen een vlucht te schrappen.")
+
+        print("Wat is het vluchtnummer?")
+        iata_code = input("> ").strip().lower()
+
+        self.db_manager.cancel_flight()

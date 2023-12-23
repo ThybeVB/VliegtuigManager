@@ -56,8 +56,10 @@ class DbManager:
             self.cursor.execute("INSERT INTO flights (iata_code, origin_airport, arrival_airport, timestamp) VALUES (?, ?, ?, ?)", (iata, origin, arrival, timestamp))
             self.db_connectie.commit()
         except Exception as e:
-            print("Fout bij uitvoeren query: ", e)          
+            print("Fout bij uitvoeren query: ", e)      
 
+    def cancel_flight(self, iata_code):
+        pass
 
     def close_connection(self):
         if self.cursor:
