@@ -11,3 +11,6 @@ class DbPlane(DbManager):
 
     def remove_plane(self, registration):
         pass
+
+    def modify_plane(self, registration, type, airline):
+        pass

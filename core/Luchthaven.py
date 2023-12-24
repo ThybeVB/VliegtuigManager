@@ -4,9 +4,9 @@ import re, locale, csv
 
 class Luchthaven():
 
-    def init(self):
-        self.db_flights = DbFlight("Luchthaven.db")
-        self.db_planes = DbPlane("Luchthaven.db")
+    def initialize(self, db_file):
+        self.db_flights = DbFlight(db_file)
+        self.db_planes = DbPlane(db_file)
 
         print("Welkom in de luchthaven applicatie.\n")
 

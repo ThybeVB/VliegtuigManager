@@ -2,7 +2,7 @@ from core.Luchthaven import Luchthaven
 
 def main():
     luchthaven = Luchthaven()
-    luchthaven.init()
+    luchthaven.initialize("Luchthaven.db")
 
 
 if __name__ == "__main__":
