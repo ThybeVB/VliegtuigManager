@@ -1,24 +1,25 @@
-from database.DbManager import DbManager
+from database.DbFlight import DbFlight
+from database.DbPlane import DbPlane
 import re, locale, csv
 
 class Luchthaven():
 
     def init(self):
-
-        self.db_manager = DbManager("Luchthaven.db")
+        self.db_flights = DbFlight("Luchthaven.db")
+        self.db_planes = DbPlane("Luchthaven.db")
 
         print("Welkom in de luchthaven applicatie.\n")
 
         print("--- Vluchten ---")
         print("1) Bekijk geplande vluchten")
         print("2) Voeg een vlucht toe")
-        print("3) Schrap een vlucht")
+        print("3) Schrap een vlucht\n")
 
         print("--- Toestellen ---")
         print("4) Voeg een toestel toe")
         print("5) Verwijder een toestel\n")
 
-        print("6) Beëindig sessie\n")
+        print("6) Beëindig sessie")
 
         while True:
             try:
@@ -38,7 +39,7 @@ class Luchthaven():
                             self.remove_plane()
                         case "6":
                             print("\nTot ziens!")
-                            self.db_manager.close_connection()
+                            self.db_flights.close_connection()
                             return
                 else:
                     print("Gelieve een getal tussen 1 en 6 in te vullen.")
@@ -46,7 +47,7 @@ class Luchthaven():
                 print("Gelieve een geldige waarde in te vullen.")
 
     def get_flights(self):
-        output = self.db_manager.get_flights()
+        output = self.db_flights.get_flights()
         if output is None:
             print("Er werden geen vluchten gevonden\n")
         else:
@@ -103,7 +104,7 @@ class Luchthaven():
         if len(origin_airport) == 0:
             origin_airport = "BRU"
 
-        self.db_manager.add_flight(iata_code, origin_airport, arrival_airport, timestamp)
+        self.db_flights.add_flight(iata_code, origin_airport, arrival_airport, timestamp)
         print("Vlucht toegevoegd!\n")
 
     def cancel_flight(self):
@@ -111,7 +112,7 @@ class Luchthaven():
 
         print("Wat is het vluchtnummer?")
         iata_code = input("> ").strip().lower()
-        self.db_manager.cancel_flight(iata_code)
+        self.db_flights.cancel_flight(iata_code)
         print(f"Vlucht {iata_code.upper()} werd geschrapt.")
 
     def add_plane(self): #todo: add nullchecks en validatie
@@ -126,7 +127,7 @@ class Luchthaven():
         print("Tot welke vluchtmaatschappij behoort het toestel?")
         airline = input("> ").strip()
 
-        self.db_manager.add_plane(registration, type, airline)
+        self.db_flights.add_plane(registration, type, airline)
         print("Vliegtuig toegevoegd!\n")
     
     def remove_plane(self):
@@ -134,5 +135,5 @@ class Luchthaven():
 
         print("Wat is de registratie van het toestel?")
         registration = input("> ").strip().lower()
-        self.db_manager.remove_plane(registration)
+        self.db_flights.remove_plane(registration)
         print(f"Toestel {registration.upper()} werd geschrapt.")
