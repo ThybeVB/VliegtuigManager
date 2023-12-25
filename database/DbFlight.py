@@ -47,7 +47,7 @@ class DbFlight(DbManager):
 
     def cancel_flight(self, iata_code):
         try:
-            self.cursor.execute(f"DELETE FROM flights WHERE UPPER(iata_code) = '{iata_code.upper()}'")
+            self.cursor.execute(f"DELETE FROM flights WHERE UPPER(iata_code) = ?", (iata_code.upper(),))
             self.db_connectie.commit()
         except Exception as e:
             print("Fout bij uitvoeren query", e)
