@@ -1,6 +1,4 @@
 __pycache__
 venv/
 *.csv
-
-#Niet alle db's, want example db wordt meegegeven
-Luchthaven.db 
+*.db
