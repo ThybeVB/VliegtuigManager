@@ -5,8 +5,7 @@ class DbFlight(DbManager):
     
     def __init__(self, db_file):
         super().__init__(db_file)
-
-    # todo: uitbreiden met zoeken op datum, bestemming
+        
     def get_flights(self, origin_airport=None, arrival_airport=None):
         try:
             query = ""
@@ -39,6 +38,15 @@ class DbFlight(DbManager):
         except Exception as e:
             print("Fout bij uitvoeren query: ", e)
 
+    def get_full_flights(self):
+        try:
+            query = "SELECT * FROM flights INNER JOIN planes ON flights.plane_registration = planes.registration"
+            self.cursor.execute(query)
+            flights = self.cursor.fetchall()
+            return flights
+        except Exception as e:
+            print("Fout bij uitvoeren query:", e)
+    
     def get_flight(self, iata):
         try: 
             self.cursor.execute(f"SELECT * FROM flights WHERE UPPER(iata_code) = ?", (iata.upper(),))

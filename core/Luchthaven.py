@@ -1,6 +1,7 @@
 from database.DbFlight import DbFlight
 from database.DbPlane import DbPlane
-import re, locale, csv
+from core.csv_writer import CsvWriter
+import re
 
 class Luchthaven():
 
@@ -14,21 +15,22 @@ class Luchthaven():
         print("1) Bekijk geplande vluchten")
         print("2) Voeg een vlucht toe")
         print("3) Bewerk een vlucht")
-        print("4) Schrap een vlucht\n")
+        print("4) Schrap een vlucht")
+        print("5) Genereer CSV-rapport\n")
 
         print("--- Toestellen ---")
-        print("5) Bekijk de toestellen")
-        print("6) Voeg een toestel toe")
-        print("7) Bewerk een toestel")
-        print("8) Verwijder een toestel\n")
+        print("6) Bekijk de toestellen")
+        print("7) Voeg een toestel toe")
+        print("8) Bewerk een toestel")
+        print("9) Verwijder een toestel\n")
 
-        print("9) Beëindig sessie")
+        print("10) Beëindig sessie")
 
         while True:
             try:
                 print("Gelieve een optie te selecteren")
                 choice = input("> ").strip()
-                if re.match(r'^[1-9]$', choice):
+                if re.match(r'^(?:[1-9]|10)$', choice):
                     match choice:
                         case "1":
                             self.get_flights()
@@ -39,19 +41,21 @@ class Luchthaven():
                         case "4":
                             self.cancel_flight()
                         case "5":
-                            self.get_planes()
+                            self.generate_csv()
                         case "6":
-                            self.add_plane()
+                            self.get_planes()
                         case "7":
-                            self.modify_plane()
+                            self.add_plane()
                         case "8":
-                            self.remove_plane()
+                            self.modify_plane()
                         case "9":
+                            self.remove_plane()
+                        case "10":
                             print("\nTot ziens!")
                             self.db_flights.close_connection()
                             return
                 else:
-                    print("Gelieve een getal tussen 1 en 9 in te vullen.")
+                    print("Gelieve een getal tussen 1 en 10 in te vullen.")
             except ValueError:
                 print("Gelieve een geldige waarde in te vullen.")
 
@@ -68,31 +72,24 @@ class Luchthaven():
             if re.match(r'^[jn]$', csv_keuze):
                 match csv_keuze:
                     case "j":
-                        self.generate_csv(output)
-                        print("CSV-bestand werd weggeschreven naar Vluchten.csv")
+                        self.generate_csv()
                     case "n":
                         return
             else:
                 print("Gelieve een correct argument te geven (J/N)")
 
-    def generate_csv(self, flight_list):
-        locale.setlocale(locale.LC_ALL, 'nl_BE.UTF-8')
-
-        try:
-            with open('Vluchten.csv', 'w', newline='') as invoice_file:
-                writer = csv.writer(invoice_file)
-                header = ["IATA Code", "Vliegt vanuit", "Vliegt naar", "Vliegtuig", "Tijdstip"]
-                writer.writerow(header)
-                for flight in flight_list:
-                    flight_record = []
-                    flight_record.append(flight.iata_code)
-                    flight_record.append(flight.origin_airport)
-                    flight_record.append(flight.arrival_airport)
-                    flight_record.append(flight.plane)
-                    flight_record.append(flight.timestamp)
-                    writer.writerow(flight_record)
-        except Exception as e:
-            print("Fout bij wegschrijven: ", e)
+    def generate_csv(self):
+        print("Wil je een gedetailleerde versie met vliegtuiginformatie (J) of een simpeler overzicht (N)? (J/N)")
+        detailed_keuze = input("> ").strip().lower()
+        if re.match(r'^[jn]$', detailed_keuze):
+            writer = CsvWriter()
+            full_list = self.db_flights.get_full_flights()
+            match detailed_keuze:
+                case "j":
+                    writer.generate_csv(full_list)
+                case "n":
+                    writer.generate_csv(full_list, include_all_fields=False)
+            print("CSV-bestand werd weggeschreven naar Vluchten.csv")
 
     def print_available_planes(self):
         print("\n--- Beschikbare Toestellen ---")
