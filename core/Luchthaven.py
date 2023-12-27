@@ -13,43 +13,45 @@ class Luchthaven():
         print("--- Vluchten ---")
         print("1) Bekijk geplande vluchten")
         print("2) Voeg een vlucht toe")
-        #add modify flight
-        print("3) Schrap een vlucht\n")
+        print("3) Bewerk een vlucht")
+        print("4) Schrap een vlucht\n")
 
         print("--- Toestellen ---")
-        print("4) Bekijk de toestellen")
-        print("5) Voeg een toestel toe")
-        print("6) Bewerk een toestel")
-        print("7) Verwijder een toestel\n")
+        print("5) Bekijk de toestellen")
+        print("6) Voeg een toestel toe")
+        print("7) Bewerk een toestel")
+        print("8) Verwijder een toestel\n")
 
-        print("8) Beëindig sessie")
+        print("9) Beëindig sessie")
 
         while True:
             try:
                 print("Gelieve een optie te selecteren")
                 choice = input("> ").strip()
-                if re.match(r'^[1-8]$', choice):
+                if re.match(r'^[1-9]$', choice):
                     match choice:
                         case "1":
                             self.get_flights()
                         case "2":
                             self.add_flight()
                         case "3":
-                            self.cancel_flight()
+                            self.modify_flight()
                         case "4":
-                            self.get_planes()
+                            self.cancel_flight()
                         case "5":
-                            self.add_plane()
+                            self.get_planes()
                         case "6":
-                            self.modify_plane()
+                            self.add_plane()
                         case "7":
-                            self.remove_plane()
+                            self.modify_plane()
                         case "8":
+                            self.remove_plane()
+                        case "9":
                             print("\nTot ziens!")
                             self.db_flights.close_connection()
                             return
                 else:
-                    print("Gelieve een getal tussen 1 en 8 in te vullen.")
+                    print("Gelieve een getal tussen 1 en 9 in te vullen.")
             except ValueError:
                 print("Gelieve een geldige waarde in te vullen.")
 
@@ -99,7 +101,7 @@ class Luchthaven():
             for plane in planes:
                 print(plane.get_summary())
 
-    def add_flight(self): #todo: add nullchecks en validatie
+    def add_flight(self):
         print("Je hebt gekozen een vlucht toe te voegen.")
         planes = self.db_planes.get_planes()
         if planes is None:
@@ -151,7 +153,7 @@ class Luchthaven():
             for plane in output:
                 print(plane.get_summary()) #todo: csv
 
-    def add_plane(self): #todo: add nullchecks en validatie
+    def add_plane(self):
         print("Je hebt gekozen een vliegtuig toe te voegen.")
 
         print("Wat is de registratie van het toestel?")
@@ -193,7 +195,55 @@ class Luchthaven():
 
         self.db_planes.modify_plane(plane_reg, newType, newAirline)
         print("Vliegtuig gewijzigd!\n")
+
+    def modify_flight(self):
+        print("Je hebt gekozen een vlucht aan te passen.")
+
+        flights = self.db_flights.get_flights()
+        if flights is None:
+            print("Er zijn geen vluchten om aan te passen.")
+            return
+        else:
+            for flight in flights:
+                print(flight.get_summary())
+
+        print("Wat is het vluchtnummer van de vlucht die je wil aanpassen?")
+        iata = ""
+        while not self.db_flights.get_flight(iata):
+            iata = input("> ").strip().upper()
+            if not self.db_flights.get_flight(iata):
+                print("Deze vlucht werd niet gevonden in de beschikbare vluchten. Vul een IATA-code uit de lijst in.")
+
+        flight = self.db_flights.get_flight(iata)
+        print("Om huidige informatie te behouden, druk je op ENTER.")
         
+        print(f"Nieuwe vertrekluchthaven ({flight.origin_airport}):")
+        new_origin = input("> ").strip()
+        if not len(new_origin):
+            new_origin = flight.origin_airport
+
+        print(f"Nieuwe bestemmingsluchthaven ({flight.arrival_airport}):")
+        new_arrival = input("> ").strip()
+        if not len(new_arrival):
+            new_arrival = flight.arrival_airport
+
+        print(f"Nieuwe vertrektijd ({flight.timestamp}):")
+        new_timestamp = input("> ").strip()
+        if not len(new_timestamp):
+            new_timestamp = flight.timestamp
+
+        self.print_available_planes()
+        print(f"Nieuw vliegtuig ({flight.plane}):")
+        plane_reg = ""
+        while not self.db_planes.get_plane(plane_reg):
+            plane_reg = input("> ").strip().upper()
+            if not len(plane_reg):
+                plane_reg = flight.plane
+            if not self.db_planes.get_plane(plane_reg):
+                print("Deze registratie werd niet gevonden in de beschikbare vliegtuigen. Vul een registratie uit de lijst in.")
+
+        self.db_flights.modify_flight(iata, new_origin, new_arrival, new_timestamp, plane_reg)
+        print("Vliegtuig gewijzigd!\n")         
     
     def remove_plane(self):
         print("Je hebt gekozen een toestel te schrappen uit de luchthaven.")
