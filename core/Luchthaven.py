@@ -13,6 +13,7 @@ class Luchthaven():
         print("--- Vluchten ---")
         print("1) Bekijk geplande vluchten")
         print("2) Voeg een vlucht toe")
+        #add modify flight
         print("3) Schrap een vlucht\n")
 
         print("--- Toestellen ---")
@@ -48,7 +49,7 @@ class Luchthaven():
                             self.db_flights.close_connection()
                             return
                 else:
-                    print("Gelieve een getal tussen 1 en 6 in te vullen.")
+                    print("Gelieve een getal tussen 1 en 8 in te vullen.")
             except ValueError:
                 print("Gelieve een geldige waarde in te vullen.")
 
@@ -78,25 +79,46 @@ class Luchthaven():
         try:
             with open('Vluchten.csv', 'w', newline='') as invoice_file:
                 writer = csv.writer(invoice_file)
-                header = ["IATA Code", "Vliegt vanuit", "Vliegt naar", "Tijdstip"]
+                header = ["IATA Code", "Vliegt vanuit", "Vliegt naar", "Vliegtuig", "Tijdstip"]
                 writer.writerow(header)
                 for flight in flight_list:
                     flight_record = []
                     flight_record.append(flight.iata_code)
                     flight_record.append(flight.origin_airport)
                     flight_record.append(flight.arrival_airport)
+                    flight_record.append(flight.plane)
                     flight_record.append(flight.timestamp)
                     writer.writerow(flight_record)
         except Exception as e:
             print("Fout bij wegschrijven: ", e)
 
+    def print_available_planes(self):
+        print("\n--- Beschikbare Toestellen ---")
+        planes = self.db_planes.get_planes()
+        if planes is not None:
+            for plane in planes:
+                print(plane.get_summary())
+
     def add_flight(self): #todo: add nullchecks en validatie
         print("Je hebt gekozen een vlucht toe te voegen.")
+        planes = self.db_planes.get_planes()
+        if planes is None:
+            print("Er werden geen vliegtuigen gevonden die aan deze vlucht gekoppeld kunnen worden. Wil je als nog de vlucht toevoegen? (J/N)")
+            keuze = input("> ").strip().lower()
+            if keuze == "n":
+                print("Toevoegen vlucht afgebroken.\n")
+                return
         
         print("Wat is het vluchtnummer?")
         iata_code = input("> ").strip()
 
-        #todo, vraag toestel met lijst van toestellen
+        self.print_available_planes()
+        print("\nWat is de registratie van het vliegtuig? Hierboven werd een lijst gedrukt met de beschikbare toestellen.")
+        plane_reg = ""
+        while not self.db_planes.get_plane(plane_reg):
+            plane_reg = input("> ").strip().upper()
+            if not self.db_planes.get_plane(plane_reg):
+                print("Deze registratie werd niet gevonden in de beschikbare vliegtuigen. Vul een registratie uit de lijst in.")
 
         print("Wat is de vertrekluchthaven? (Standaard: BRU)")
         origin_airport = input("> ").strip().upper()
@@ -110,7 +132,7 @@ class Luchthaven():
         if len(origin_airport) == 0:
             origin_airport = "BRU"
 
-        self.db_flights.add_flight(iata_code, origin_airport, arrival_airport, timestamp)
+        self.db_flights.add_flight(iata_code, origin_airport, arrival_airport, timestamp, plane_reg)
         print("Vlucht toegevoegd!\n")
 
     def cancel_flight(self):
@@ -147,11 +169,16 @@ class Luchthaven():
     def modify_plane(self):
         print("Je hebt gekozen een vliegtuig aan te passen.")
 
-        #todo: toon evtl nog lijst van toestelllen
-        print("Wat is de registratie van het toestel die je wil aanpassen?")
-        registration = input("> ").strip()
+        self.print_available_planes()
 
-        plane = self.db_planes.get_plane(registration)
+        print("Wat is de registratie van het toestel die je wil aanpassen?")
+        plane_reg = ""
+        while not self.db_planes.get_plane(plane_reg):
+            plane_reg = input("> ").strip().upper()
+            if not self.db_planes.get_plane(plane_reg):
+                print("Deze registratie werd niet gevonden in de beschikbare vliegtuigen. Vul een registratie uit de lijst in.")
+
+        plane = self.db_planes.get_plane(plane_reg)
         print("Om huidige informatie te behouden, druk je op ENTER.")
         
         print(f"New type ({plane.type}):")
@@ -164,7 +191,7 @@ class Luchthaven():
         if not len(newAirline):
             newAirline = plane.airline
 
-        self.db_planes.modify_plane(registration, newType, newAirline)
+        self.db_planes.modify_plane(plane_reg, newType, newAirline)
         print("Vliegtuig gewijzigd!\n")
         
     

@@ -8,12 +8,21 @@ class DbManager:
 
             self.initialize()
 
-        except:
-            print("Geen connectie met database mogelijk")
+        except Exception as e:
+            print("Geen connectie met database mogelijk: ", e)
             sys.exit(-1)
 
     def initialize(self):
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS flights (id INTEGER PRIMARY KEY, iata_code TEXT, origin_airport TEXT, arrival_airport TEXT, timestamp TEXT)''')
+        self.cursor.execute('''
+                            CREATE TABLE IF NOT EXISTS flights(
+                                id INTEGER PRIMARY KEY,
+                                iata_code TEXT, 
+                                origin_airport TEXT, 
+                                arrival_airport TEXT, 
+                                timestamp TEXT,
+                                plane_registration TEXT, 
+                                FOREIGN KEY (plane_registration) REFERENCES planes(registration))
+                            ''')
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS planes (registration TEXT PRIMARY KEY, type TEXT, airline TEXT)''')
         
         self.db_connectie.commit()

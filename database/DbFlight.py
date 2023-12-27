@@ -30,17 +30,21 @@ class DbFlight(DbManager):
                     origin_airport = flightRecord[2]
                     arrival_airport = flightRecord[3]
                     timestamp = flightRecord[4]
+                    plane = flightRecord[5]
 
-                    obj = Flight(iata_code, origin_airport, arrival_airport, timestamp)
+                    obj = Flight(iata_code, origin_airport, arrival_airport, timestamp, plane)
                     flightList.append(obj)
 
                 return flightList
         except Exception as e:
             print("Fout bij uitvoeren query: ", e)
 
-    def add_flight(self, iata, origin, arrival, timestamp):
+    def add_flight(self, iata, origin, arrival, timestamp, plane_reg):
         try:
-            self.cursor.execute("INSERT INTO flights (iata_code, origin_airport, arrival_airport, timestamp) VALUES (?, ?, ?, ?)", (iata, origin, arrival, timestamp))
+            if len(plane_reg) == 0:
+                self.cursor.execute("INSERT INTO flights (iata_code, origin_airport, arrival_airport, timestamp) VALUES (?, ?, ?, ?)", (iata, origin, arrival, timestamp))
+            else:
+                self.cursor.execute("INSERT INTO flights (iata_code, origin_airport, arrival_airport, timestamp, plane_registration) VALUES (?, ?, ?, ?, ?)", (iata, origin, arrival, timestamp, plane_reg))
             self.db_connectie.commit()
         except Exception as e:
             print("Fout bij uitvoeren query: ", e)
