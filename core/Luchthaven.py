@@ -1,14 +1,11 @@
 from database.DbFlight import DbFlight
 from database.DbPlane import DbPlane
 from core.csv_writer import CsvWriter
-import re
+import re, os
 
 class Luchthaven():
 
-    def initialize(self, db_file):
-        self.db_flights = DbFlight(db_file)
-        self.db_planes = DbPlane(db_file)
-
+    def print_command_list(self):
         print("Welkom in de luchthaven applicatie.\n")
 
         print("--- Vluchten ---")
@@ -25,9 +22,22 @@ class Luchthaven():
         print("9) Verwijder een toestel\n")
 
         print("10) Beëindig sessie")
+    
+    def cls(self):
+        os.system('cls' if os.name=='nt' else 'clear')
 
+    def initialize(self, db_file):
+        self.db_flights = DbFlight(db_file)
+        self.db_planes = DbPlane(db_file)
+
+        self.print_command_list()
+
+        has_ran = False
         while True:
             try:
+                if has_ran:
+                        self.cls()
+                        self.print_command_list()
                 print("Gelieve een optie te selecteren")
                 choice = input("> ").strip()
                 if re.match(r'^(?:[1-9]|10)$', choice):
@@ -54,6 +64,8 @@ class Luchthaven():
                             print("\nTot ziens!")
                             self.db_flights.close_connection()
                             return
+                    input("Druk op een willekeurige toets om door te gaan...")
+                    has_ran = True
                 else:
                     print("Gelieve een getal tussen 1 en 10 in te vullen.")
             except ValueError:
@@ -148,7 +160,7 @@ class Luchthaven():
             print("Er werden geen vliegtuigen gevonden\n")
         else:
             for plane in output:
-                print(plane.get_summary()) #todo: csv
+                print(plane.get_summary())
 
     def add_plane(self):
         print("Je hebt gekozen een vliegtuig toe te voegen.")
