@@ -26,4 +26,4 @@ Een CSV-verslag kan gemaakt worden van de vluchten samen met het vliegtuig die v
 4. Als je de voorbeelddatabase wil gebruiken, verander je `Luchthaven.db.example` naar `Luchthaven.db`
     - Als je de voorbeelddatabase niet wil gebruiken, zal de applicatie een database voor je aanmaken.
     - Als je al een database hebt om te gebruiken, plaats je die in de root directory.
-5. Voer de applicatie uit met Python (`python __main__.py`)
+5. Voer de applicatie uit met Python 3.10 of recenter (`python __main__.py`)
