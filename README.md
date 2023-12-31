@@ -21,7 +21,7 @@ Een CSV-verslag kan gemaakt worden van de vluchten samen met het vliegtuig die v
 ## Aan de slag
 
 1. Clone de repository met Git naar je locale machine (`git clone https://github.com/ThybeVB/VliegtuigManager`)
-2. Creëer een virtuele omgeving (`python -m venv venv`)
+2. Creëer een virtuele omgeving (`python -m venv venv`) en ga in de omgeving.
 3. Installeer de dependencies (`pip install -r requirements.txt`)
 4. Als je de voorbeelddatabase wil gebruiken, verander je `Luchthaven.db.example` naar `Luchthaven.db`
     - Als je de voorbeelddatabase niet wil gebruiken, zal de applicatie een database voor je aanmaken.
